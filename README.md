@@ -21,7 +21,6 @@ Currently there's no easy way to set this up. In short:
 - Make sure that the file `./minecraft-cli.py` has the `x` permission so that you can run it
 - You need to have some text editor at `/usr/bin/editor` (should be done automatically)
 - You need to be able to use an interactive prompt (uses python's input function, so if your shell doesn't support that, use another shell)
-I think that is it, should work.
 
 ## TODO-list:
 - Add some sort of backup system (both automatic as a service and manually)
