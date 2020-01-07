@@ -51,6 +51,9 @@ if args.action == "create":
         if not args.y:
             wanted_version = input(
                 f"What version would you like to use? ({manifest['latest']['release']}): ").strip()
+        else:
+            print(f"As this is running with -y, the latest release ({manifest['latest']['release']}) will be selected.")
+            wanted_version = manifest['latest']['release']
         if not wanted_version:
             wanted_version = manifest['latest']['release']
         print(f"You selected {wanted_version}")
