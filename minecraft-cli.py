@@ -19,9 +19,11 @@ os.chdir(base_path)
 
 
 def confirm(text="Continue?", default=True):
-    confirmation = input(f"{text} ({'Y/n' if default else 'y/N'}): ").lower()
+    full_text = f"{text} ({'Y/n' if default else 'y/N'}): "
+    print(full_text + "yes")
     if args.y:
         return True
+    confirmation = input(full_text).lower()
 
     if default:
         if confirmation.startswith("y") or not confirmation:
