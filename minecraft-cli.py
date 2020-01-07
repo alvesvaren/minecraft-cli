@@ -75,7 +75,7 @@ elif args.action == "enable":
     confirmation = input("Continue? (Y/n): ").lower()
     if "y" in confirmation or not confirmation:
         print(f"Enabling and starting the server {args.server}")
-        os.system("systemctl enable --now minecraft-server@{args.server}")
+        os.system(f"systemctl enable --now minecraft-server@{args.server}")
 elif args.action == "restart":
     print("This will save all worlds and restart the server")
     confirmation = input("Continue? (Y/n): ").lower()
