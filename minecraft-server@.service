@@ -1,0 +1,24 @@
+[Unit]
+description=Minecraft CLI Server: %i
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/minecraft-servers/%i
+
+User=minecraft
+Group=minecraft
+
+Restart=always
+
+ExecStart=/usr/bin/screen -DmS mc-%i /usr/bin/java -Xmx4G -jar server.jar nogui
+
+ExecStop=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "say Server shutting down in 5 seconds..."\015'
+ExecStop=echo Shutting down server in 5 seconds...
+ExecStop=/bin/sleep 5
+ExecStop=/bin/echo Saving worlds...
+ExecStop=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "save-all"\015'
+ExecStop=/bin/echo Stopping server...
+ExecStop=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "stop"\015'
+
+[Install]
+WantedBy=multi-user.target
