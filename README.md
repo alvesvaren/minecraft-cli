@@ -16,7 +16,7 @@ Currently there's no easy way to set this up. In short:
 - You need to have `screen` installed
 - You need a user called 'minecraft' (not a sudoer)
 - You need a folder at `/opt/minecraft-servers` owned by `minecraft:minecraft` (`chown minecraft:minecraft /opt/minecraft-servers`)
-- You need to add a symlink from `./minecraft-server@.service` to `/etc/systemd/system/minecraft-server@.service` (`ln -s minecraft-server@.service /etc/systemd/system/minecraft-server@.service`)
+- You need to add a symlink from `./minecraft-server@.service` to `/etc/systemd/system/minecraft-server@.service` (`sudo systemctl link $PWD/minecraft-service@.service`)
 - You need to add a symlink from `./minecraft-cli.py` to `/usr/bin/minecraft-cli` (`ln -s minecraft-cli.py /usr/bin/minecraft-cli`)
 - Make sure that the file `./minecraft-cli.py` has the `x` permission so that you can run it
 - You need to have some text editor at `/usr/bin/editor` (should be done automatically)
