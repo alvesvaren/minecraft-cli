@@ -8,7 +8,7 @@ base_path = "/opt/minecraft-servers/"
 parser = argparse.ArgumentParser(
     description="Minecraft command line interface", prog="minecrat-cmi")
 parser.add_argument("action", type=str, help="The action to run.", choices=[
-                    "create", "remove", "enable", "restart", "backup", "start", "stop", "status", "modify", "cd", "console", "path"])
+                    "create", "remove", "enable", "restart", "backup", "start", "stop", "status", "modify", "cd", "console", "path", "test"])
 parser.add_argument("server", type=str,
                     help="The name of the server to run the action on.")
 parser.add_argument(
@@ -157,3 +157,13 @@ elif args.action == "backup":
 
 elif args.action == "path":
     print(base_path + args.server)
+
+elif args.action == "test":
+    print("Testing by creating a server with the name 'test'")
+    if confirm():
+        os.system("sudo -v")
+        os.system("sudo su minecraft -c \"minecraft-cli create test -y\"")
+        os.system("sudo minecraft-cli start test -y")
+        os.system("sudo minecraft-cli stop test -y")
+        os.system("sudo su minecraft -c \"minecraft-cli remove test -y\"")
+        print("If there wasn't any errors while running the commands above, the test was successful!")
