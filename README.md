@@ -40,7 +40,7 @@ $ sudo systemctl link $PWD/minecraft-server@.service
 $ chmod +x minecraft-cli.py
 ```
 
-- Now this should be installed correctly
+- Now this should be installed correctly. Try `minecraft-cli test` to make a test-server, start it, stop it and then remove it.
 
 ## TODO-list:
 - Add some sort of backup system (both automatic as a service and manually)
