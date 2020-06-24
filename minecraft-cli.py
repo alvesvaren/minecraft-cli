@@ -8,7 +8,7 @@ base_path = "/opt/minecraft-servers/"
 parser = argparse.ArgumentParser(
     description="Minecraft command line interface", prog="minecrat-cmi")
 parser.add_argument("action", type=str, help="The action to run.", choices=[
-                    "create", "remove", "enable", "restart", "backup", "start", "stop", "status", "modify", "cd", "console", "path"])
+                    "create", "remove", "enable", "restart", "backup", "start", "stop", "status", "modify", "cd", "console", "path", "update"])
 parser.add_argument("server", type=str,
                     help="The name of the server to run the action on.")
 parser.add_argument(
@@ -33,6 +33,34 @@ def confirm(text="Continue?", default=True):
             return True
 
 
+def get_manifest(url: str = "https://launchermeta.mojang.com/mc/game/version_manifest.json") -> dict:
+    return requests.get(
+        url).json()
+
+
+def download_version(manifest: dict,  path: str, version_str: str = ""):
+    if not version_str:
+        version_str = manifest["latest"]["release"]
+    print(f"Selected game version {version_str}")
+    version_info_url: str
+    for version in manifest["versions"]:
+        if version["id"] == version_str:
+            version_info_url = version["url"]
+            break
+
+    if not version_info_url:
+        raise FileNotFoundError("Did not find server url")
+
+    server_binary_url = requests.get(version_info_url).json()[
+        "downloads"]["server"]["url"]
+    print(f"Server binary url is {server_binary_url}, downloading...", end="")
+    with open(path, "wb") as file:
+        file.write(requests.get(server_binary_url,
+                                allow_redirects=True).content)
+    print("DONE!")
+    print(f"Server file written to {path}")
+
+
 if args.action == "create":
     print(f"Started creation of server {args.server}")
     folder = base_path + args.server
@@ -44,39 +72,16 @@ if args.action == "create":
     if confirm("Would you like to use vanilla?"):
         print("Creating vanilla server")
         print("Fetching version info...", end="")
-        manifest = requests.get(
-            "https://launchermeta.mojang.com/mc/game/version_manifest.json").json()
+        manifest = get_manifest()
         print("DONE!")
         print()
         if not args.y:
             wanted_version = input(
                 f"What version would you like to use? ({manifest['latest']['release']}): ").strip()
         else:
-            print(f"As this is running with -y, the latest release ({manifest['latest']['release']}) will be selected.")
-            wanted_version = manifest['latest']['release']
-        if not wanted_version:
-            wanted_version = manifest['latest']['release']
-        print(f"You selected {wanted_version}")
-        print(f"Finding manifest for that version")
-        version_info_url = ""
-        for version in manifest['versions']:
-            if version["id"] == wanted_version:
-                print(f"Found manifest url: {version['url']}")
-                version_info_url = version['url']
-                print(f"Server version is of type '{version['type']}'")
-                break
-        if not version_info_url:
-            print("Did not find that manifest. Try again with another version")
-            quit(1)
-        server_binary_url = requests.get(version_info_url).json()[
-            "downloads"]["server"]["url"]
-        print(f"Server binary url found at {server_binary_url}")
-        print("Downloading...", end="")
-        with open("server.jar", "wb") as file:
-            file.write(requests.get(server_binary_url,
-                                    allow_redirects=True).content)
-        print("DONE!")
-        print("Server file written to server.jar")
+            print(
+                f"As this is running with -y, the latest release ({manifest['latest']['release']}) will be selected.")
+        download_version(manifest, "server.jar", wanted_version)
         print("Running first time setup (creating files)...", end="")
         os.system("java -jar server.jar > /dev/null")
         print("DONE!")
@@ -90,6 +95,15 @@ if args.action == "create":
     print("Server creation done!")
     print(
         f"Start and enable the server using 'minecraft-cli enable {args.server}'")
+
+elif args.action == "update":
+    manifest = get_manifest()
+    wanted_version = input(f"What version would you like to replace the server binary with? ({manifest['latest']['release']}): ").strip()
+    os.chdir(base_path + args.server)
+    os.remove("server.jar")
+    print("Downloading version and writing...", end="")
+    download_version(manifest, "server.jar", wanted_version)
+    print("DONE!")
 
 elif args.action == "remove":
     if confirm(f"Are you sure that you want to remove {args.server}?", False):
